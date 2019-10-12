@@ -15,10 +15,10 @@ defmodule PoolboyApp.Worker do
 
 	def handle_call({:square_root, x}, _from, state) do
 		IO.puts "progress #{ inspect(self()) } calculating square root of #{x}"
-		# make immitation of o hung up process
-		#:timer.sleep(Enum.random 1000..10000)
-		#IO.puts ""
-		:timer.sleep(1000)
+		# make immitation of a hung up or a long time processing
+		processing_time = 1000 #Enum.random 1000..5000 #10000
+		IO.puts "::processing time -> #{ processing_time }"
+		:timer.sleep(processing_time)
 		{:reply, :math.sqrt(x), state}
 	end
 

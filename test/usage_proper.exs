@@ -10,7 +10,7 @@ defmodule PoolboyApp.UsageProper do
     end
   end
 
-
+	#TODO: uncomment
 	#property "exactly 20 reqeusts ok" do
 	#	:ok == PoolboyApp.Usage.start
 	#end
@@ -27,8 +27,7 @@ defmodule PoolboyApp.UsageProper do
 			<- sized(sz, resize(sz * 2, list(pos_integer())))
 		do
 			res = PoolboyApp.Usage.start load
-			#collect(, load) 
-			aggregate(true, result: {res, :erlang.length(load))
+			aggregate(true, result: {res, :erlang.length(load)})
 		end
 	end
 

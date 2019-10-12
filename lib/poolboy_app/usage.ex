@@ -26,8 +26,7 @@ defmodule PoolboyApp.Usage do
 	@spec start(arg) :: :ok when arg: list
 	def start(load) when is_list(load) do
 		IO.puts "::load -> #{ inspect load }" 
-		IO.puts "::len -> #{ inspect length load }"
-
+		IO.puts "::len -> #{ inspect length(load) }"
 		load	
 		|> Enum.map(fn i -> async_call_square_root(i) end)
 		|> Enum.each(fn task -> await_and_inspect(task) end)
