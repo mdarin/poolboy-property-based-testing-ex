@@ -22,6 +22,15 @@ defmodule PoolboyApp.Worker do
 		{:reply, :math.sqrt(x), state}
 	end
 
+	def handle_call({:square_root2, x}, _from, state) do
+		IO.puts "progress #{ inspect(self()) } calculating square root of #{x}"
+		# make immitation of a hung up or a long time processing
+		processing_time = 1000 #Enum.random 1000..5000 #10000
+		IO.puts "::processing time -> #{ processing_time }"
+		:timer.sleep(processing_time)
+		{:reply, {x,:math.sqrt(x)}, state}
+	end
+
 	def handle_call(request, _from, state) do
 		IO.puts "unhandled request #{ inspect request }"
 		{:noreply, state}

@@ -1,35 +1,60 @@
 defmodule PoolboyApp.UsageProper do
   use ExUnit.Case
   use PropCheck
+	use Task
+	
+	# units
 
-  # property
+  test "run several task simultaniously" do
+#		task = Task.async(fn -> PoolboyApp.Usage.start end)
+#		res = Task.await(task)
+#		IO.puts "res -> #{ inspect res }"
 
-  property "always works" do
-    forall type <- term() do
-      boolean(type)
-    end
+		complete = 
+		1..1
+		 |> Enum.map(fn _ -> Task.async(fn -> PoolboyApp.Usage.start end) end)
+		 |> Enum.reduce([], fn 
+				task, acc  ->
+					x = Task.await(task)
+					IO.puts "::x -> #{ inspect x }"
+			 		[x|acc]
+			end)
+		IO.puts "::complete -> #{ inspect complete }"
+		assert true == true
   end
 
 	#TODO: uncomment
-	#property "exactly 20 reqeusts ok" do
+	#test "exactly 20 reqeusts ok" do
 	#	:ok == PoolboyApp.Usage.start
 	#end
 
+  # property
+
+#  property "always works" do
+#    forall type <- term() do
+#      boolean(type)
+#    end
+#  end
+
+	
+
 	# per test by setting "@tag timeout: x" (accepts :infinity)
 	@tag timeout: :infinity
-	property "huge loading immitation", [:verbose] do
-		forall load 
-			# the ?SIZED(VarName, Expression) macro, which
-			# introduces the variable VarName into the scope of Expression , bound to the
-			# internal size value for the current execution. This size value changes with
-			# every test, so what we do with the macro is change its scale, rather than
-			# replacing it wholesale.
-			<- sized(sz, resize(sz * 2, list(pos_integer())))
-		do
-			res = PoolboyApp.Usage.start load
-			aggregate(true, result: {res, :erlang.length(load)})
-		end
-	end
+#	property "huge loading immitation", [:verbose] do
+#		forall load
+#			#<- list(pos_integer()) # this test pass well
+#
+#			# the ?SIZED(VarName, Expression) macro, which
+#			# introduces the variable VarName into the scope of Expression , bound to the
+#			# internal size value for the current execution. This size value changes with
+#			# every test, so what we do with the macro is change its scale, rather than
+#			# replacing it wholesale.
+#			<- sized(sz, resize(sz * Enum.random(1..100), list(pos_integer())))
+#		do
+#			res = PoolboyApp.Usage.start load
+#			aggregate(true, result: {res, :erlang.length(load)})
+#		end
+#	end
 
 
   # helpers

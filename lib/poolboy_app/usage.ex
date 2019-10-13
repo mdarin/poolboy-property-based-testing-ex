@@ -1,5 +1,6 @@
 defmodule PoolboyApp.Usage do
 	use Task
+	use Agent
 
 	# response timeout
 	@timeout 6000
@@ -16,20 +17,22 @@ defmodule PoolboyApp.Usage do
 	def start do
 		0..20
 		|> Enum.map(fn i -> async_call_square_root(i) end)
-		|> Enum.each(fn task -> await_and_inspect(task) end)
+		|> Enum.reduce([], fn task,acc -> [await_and_inspect(task)|acc] end)
 	end
 
 
 	@doc """
 		load is a list of integer values that will be passed to worker for further handling 
 	"""
-	@spec start(arg) :: :ok when arg: list
+	@spec start(arg) :: arg when arg: list
 	def start(load) when is_list(load) do
+		IO.puts "----------------------------------" 
 		IO.puts "::load -> #{ inspect load }" 
 		IO.puts "::len -> #{ inspect length(load) }"
+		IO.puts "----------------------------------" 
 		load	
 		|> Enum.map(fn i -> async_call_square_root(i) end)
-		|> Enum.each(fn task -> await_and_inspect(task) end)
+		|> Enum.reduce( [], fn task,acc -> [await_and_inspect(task)|acc] end)
 	end
 
 
@@ -41,7 +44,7 @@ defmodule PoolboyApp.Usage do
 		Task.async(fn ->
 			:poolboy.transaction(
 				:worker,
-				fn pid -> GenServer.call(pid, {:square_root, i}) end,
+				fn pid -> GenServer.call(pid, {:square_root2, i}) end,
 				@timeout
 			)
 		end)
@@ -50,7 +53,11 @@ defmodule PoolboyApp.Usage do
 	defp await_and_inspect(task) do
 		 task 
 			|> Task.await(@timeout) 
-			|> (fn (res) -> IO.puts "::result #{ inspect res }" end).()
+			|> (fn 
+					res -> 
+						IO.puts "::await.result #{ inspect res }"
+						res 
+				end).()
 	end
 
 end # eof module
