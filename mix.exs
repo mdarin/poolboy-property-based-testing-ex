@@ -15,7 +15,7 @@ defmodule PoolboyApp.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:logger, :gen_state_machine],
       mod: {PoolboyApp.Application, []}
     ]
   end
@@ -27,7 +27,8 @@ defmodule PoolboyApp.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
       {:poolboy, "~> 1.5.1"},
 			{:propcheck, "~> 1.1", only: [:test, :dev]},
-      {:dialyxir, "~> 0.4", only: [:dev]}
+      {:dialyxir, "~> 0.4", only: [:dev]},
+			{:gen_state_machine, "~> 2.0"}
     ]
   end
 
