@@ -2,8 +2,14 @@ defmodule PoolboyApp.Usage do
 	use Task
 	use Agent
 
-	# response timeout
-	@timeout 6000
+	@moduledoc false
+	
+	
+	#	If no worker is available in the pool, Poolboy will timeout after the default timeout period
+	# (five seconds) and won’t accept any new requests. In our example, we’ve increased the default
+	# 	timeout to one minute in order to demonstrate how we can change the default timeout value.
+	# 	In case of this app, you can observe the error if you change the value of @timeout to less than 1000.
+	@timeout 60000
 
 
 	##
@@ -30,9 +36,15 @@ defmodule PoolboyApp.Usage do
 		IO.puts "::load -> #{ inspect load }" 
 		IO.puts "::len -> #{ inspect length(load) }"
 		IO.puts "----------------------------------" 
+		#queue = :queue.from_list(load)	
+		#IO.puts "::queue -> #{ inspect queue }"
+		#IO.puts "::queue.out -> #{ inspect :queue.out(queue) }"
+		timeout = length(load) * 1000
+		
 		load	
-		|> Enum.map(fn i -> async_call_square_root(i) end)
+		|> Enum.map(fn i -> async_call_square_root(i, timeout) end)
 		|> Enum.reduce( [], fn task,acc -> [await_and_inspect(task)|acc] end)
+
 	end
 
 
@@ -40,12 +52,13 @@ defmodule PoolboyApp.Usage do
 	## internals
 	#
 
-	defp async_call_square_root(i) do
+
+	defp async_call_square_root(i, timeout \\ @timeout) do
 		Task.async(fn ->
 			:poolboy.transaction(
 				:worker,
 				fn pid -> GenServer.call(pid, {:square_root2, i}) end,
-				@timeout
+				timeout
 			)
 		end)
 	end

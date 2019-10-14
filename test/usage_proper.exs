@@ -5,28 +5,42 @@ defmodule PoolboyApp.UsageProper do
 	
 	# units
 
-  test "run several task simultaniously" do
-#		task = Task.async(fn -> PoolboyApp.Usage.start end)
-#		res = Task.await(task)
-#		IO.puts "res -> #{ inspect res }"
 
-		complete = 
-		1..1
-		 |> Enum.map(fn _ -> Task.async(fn -> PoolboyApp.Usage.start end) end)
-		 |> Enum.reduce([], fn 
-				task, acc  ->
-					x = Task.await(task)
-					IO.puts "::x -> #{ inspect x }"
-			 		[x|acc]
-			end)
-		IO.puts "::complete -> #{ inspect complete }"
-		assert true == true
-  end
+	@doc """
+		Simple use case example
+	"""
+#	test "exactly 21 reqeusts ok" do
+#		result = Task.async(fn -> PoolboyApp.Usage.start end) |> Task.await()
+#		IO.puts "::test.result -> #{ inspect result }"
+#		IO.puts "::len #{inspect length result }"
+#		IO.puts "::len == 21 -> #{ inspect (length result) == 21 }"
+#		assert (length result) == 21
+#	end
 
-	#TODO: uncomment
-	#test "exactly 20 reqeusts ok" do
-	#	:ok == PoolboyApp.Usage.start
-	#end
+#  test "run several task simultaniously" do
+#		complete = 
+#			1..2
+#			 |> Enum.map(fn _ -> Task.async(fn -> PoolboyApp.Usage.start end) end)
+#			 |> Enum.reduce([], fn task,acc  -> [Task.await(task)|acc] end)
+#		IO.puts "::complete -> #{ inspect complete }"
+#		assert true == true 
+#  end
+
+
+	test "queue server test" do
+		IO.puts "::async deq -> #{ inspect PoolboyApp.Queue.dequeue_a({self(), :test}) }"
+		IO.puts "::sync deq	-> #{ inspect PoolboyApp.Queue.dequeue }"	
+		assert true == true 
+	end
+
+
+
+#	test "TDD test case ok" do
+#		result = Task.async(fn -> 1..12 |> Enum.to_list |> PoolboyApp.Usage.start end) |> Task.await()
+#		IO.puts "::test.result -> #{ inspect result }"
+#		assert true == true 
+#	end
+
 
   # property
 
@@ -40,21 +54,21 @@ defmodule PoolboyApp.UsageProper do
 
 	# per test by setting "@tag timeout: x" (accepts :infinity)
 	@tag timeout: :infinity
-#	property "huge loading immitation", [:verbose] do
-#		forall load
-#			#<- list(pos_integer()) # this test pass well
-#
-#			# the ?SIZED(VarName, Expression) macro, which
-#			# introduces the variable VarName into the scope of Expression , bound to the
-#			# internal size value for the current execution. This size value changes with
-#			# every test, so what we do with the macro is change its scale, rather than
-#			# replacing it wholesale.
-#			<- sized(sz, resize(sz * Enum.random(1..100), list(pos_integer())))
-#		do
-#			res = PoolboyApp.Usage.start load
-#			aggregate(true, result: {res, :erlang.length(load)})
-#		end
-#	end
+	property "huge loading immitation", [:verbose] do
+		forall load
+			#<- list(pos_integer()) # this test pass well
+
+			# the ?SIZED(VarName, Expression) macro, which
+			# introduces the variable VarName into the scope of Expression , bound to the
+			# internal size value for the current execution. This size value changes with
+			# every test, so what we do with the macro is change its scale, rather than
+			# replacing it wholesale.
+			<- sized(sz, resize(sz * Enum.random(1..100), list(pos_integer())))
+		do
+			res = PoolboyApp.Usage.start load
+			aggregate(true, result: {res, :erlang.length(load)})
+		end
+	end
 
 
   # helpers

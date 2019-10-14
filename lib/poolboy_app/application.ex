@@ -9,7 +9,8 @@ defmodule PoolboyApp.Application do
     children = [
       # Starts a worker by calling: PoolboyApp.Worker.start_link(arg)
       # {PoolboyApp.Worker, arg}
-			:poolboy.child_spec(:worker, poolboy_config())
+			:poolboy.child_spec(:worker, poolboy_config()),
+			PoolboyApp.Queue # The same as {PoolboyApp.Queue, []}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
